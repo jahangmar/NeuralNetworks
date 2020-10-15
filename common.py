@@ -10,27 +10,32 @@ buffer_size = 10000
 embedding_dim = 256
 rnn_units = 1024
 
-epochs=1
-
+epochs=10
 
 parser = argparse.ArgumentParser()
 parser.add_argument('directory', nargs=1)
 
-args = parser.parse_args()
-directory = args.directory[0]
 
-checkpoint_dir = os.path.join(directory, 'checkpoints')
+def parse_args():
+    args = parser.parse_args()
+    directory = args.directory[0]
 
-filename = os.path.join(directory, 'input.txt')
+    global checkpoint_dir
+    checkpoint_dir = os.path.join(directory, 'checkpoints')
 
-text = open(filename, 'rb').read().decode(encoding='utf-8')
-print('Length of file {} is {} characters.'.format(filename, len(text)))
+    filename = os.path.join(directory, 'input.txt')
 
-vocab = sorted(set(text))
-char2idx = {u:i for i,u in enumerate(vocab)}
-idx2char = np.array(vocab)
+    global text
+    text = open(filename, 'rb').read().decode(encoding='utf-8')
+    print('Length of file {} is {} characters.'.format(filename, len(text)))
 
-itext = np.array([char2idx[c] for c in text])
+    global vocab, char2idx, idx2char, itext
+    vocab = sorted(set(text))
+    char2idx = {u:i for i,u in enumerate(vocab)}
+    idx2char = np.array(vocab)
+
+    itext = np.array([char2idx[c] for c in text])
+    return args
 
 
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):

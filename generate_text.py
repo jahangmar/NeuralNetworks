@@ -4,6 +4,13 @@ import sys
 
 from common import *;
 
+parser.add_argument('ckpt', nargs=1)
+parser.add_argument('start_string', nargs=1)
+args = parse_args()
+start_string = args.start_string[0]
+ckpt_n = args.ckpt[0]
+
+from common import checkpoint_dir, text, vocab, char2idx, idx2char, itext;
 
 def generate_text(model, start_string):
     num=1000
@@ -32,25 +39,15 @@ def generate_text(model, start_string):
 
 
 #latest = tf.train.latest_checkpoint(checkpoint_dir)
-latest = './'+checkpoint_dir + '/ckpt_1'
-if latest == None:
-    print('checkpoint cannot be loaded from ' + checkpoint_dir)
-    sys.exit()
+#TODO temporary solution since latest_checkpoint doesn't work
+latest = os.path.join(checkpoint_dir, 'ckpt_' + ckpt_n)
 
 loaded_model = tf.keras.models.load_model(latest, compile=False)
-
-#def loss(labels, logits):
-#        return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
-
-
-#model.compile(optimizer='adam', loss=loss)
 
 
 model = build_model(len(vocab), embedding_dim, rnn_units, batch_size=1)
 model.set_weights(loaded_model.get_weights())
-#model.load_weights(latest)
-#model.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
 model.build(tf.TensorShape({1, None}))
 
-text = generate_text(model, start_string=u"My home")
+text = generate_text(model, start_string=start_string)
 print(text)
