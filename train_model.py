@@ -9,7 +9,7 @@ parser.add_argument('--epochs', nargs=1, default=epochs, type=int)
 parser.add_argument('--load_model', nargs=1, default=-1, type=int)
 args = parse_args()
 epochs = args.epochs[0]
-load_model_num = args.load_model[0]
+#load_model_num = args.load_model[0]
 from common import checkpoint_dir, text, vocab, char2idx, idx2char, itext;
 
 examples_per_epoch = len(text)
@@ -30,9 +30,11 @@ dataset = sequences.map(split_input_target)
 
 dataset = dataset.shuffle(buffer_size).batch(batch_size, drop_remainder=True)
 
-if load_model_num > -1:
-    print ('bla')
+if os.path.isdir(checkpoint_dir):
+    print('###loading model from checkpoint')
+    model = tf.keras.models.load_model(checkpoint_dir, compile=False)
 else:
+    print('###creating new model')
     model = build_model(
         vocab_size=len(vocab),
         embedding_dim=embedding_dim,
@@ -47,8 +49,12 @@ model.compile(optimizer='adam', loss=loss)
 
 
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath = os.path.join(checkpoint_dir, "ckpt_{epoch}"),
-        verbose=1,
-        save_weigths_only=True)
+#        filepath = os.path.join(checkpoint_dir, "ckpt_{epoch}"),
+        filepath = checkpoint_dir,
+        save_best_only=True,
+        monitor='loss',
+        mode = 'min',
+        verbose=1
+        )
 
 history = model.fit(dataset, epochs=epochs, callbacks=[checkpoint_callback])

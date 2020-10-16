@@ -4,11 +4,9 @@ import sys
 
 from common import *;
 
-parser.add_argument('ckpt', nargs=1)
 parser.add_argument('start_string', nargs=1)
 args = parse_args()
 start_string = args.start_string[0]
-ckpt_n = args.ckpt[0]
 
 from common import checkpoint_dir, text, vocab, char2idx, idx2char, itext;
 
@@ -37,10 +35,7 @@ def generate_text(model, start_string):
     return (start_string + ''.join(text_generated))
 
 
-
-#latest = tf.train.latest_checkpoint(checkpoint_dir)
-#TODO temporary solution since latest_checkpoint doesn't work
-latest = os.path.join(checkpoint_dir, 'ckpt_' + ckpt_n)
+latest = checkpoint_dir
 
 loaded_model = tf.keras.models.load_model(latest, compile=False)
 
