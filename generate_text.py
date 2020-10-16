@@ -8,7 +8,7 @@ parser.add_argument('start_string', nargs=1)
 args = parse_args()
 start_string = args.start_string[0]
 
-from common import checkpoint_dir, text, vocab, char2idx, idx2char, itext;
+from common import checkpoint_dir, vocab, char2idx, idx2char;
 
 def generate_text(model, start_string):
     num=1000

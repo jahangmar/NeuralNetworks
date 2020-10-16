@@ -6,18 +6,19 @@ import time
 from common import *;
 
 parser.add_argument('--epochs', nargs=1, default=epochs, type=int)
-parser.add_argument('--load_model', nargs=1, default=-1, type=int)
+#parser.add_argument('--load_model', nargs=1, default=-1, type=int)
 args = parse_args()
 epochs = args.epochs[0]
 #load_model_num = args.load_model[0]
-from common import checkpoint_dir, text, vocab, char2idx, idx2char, itext;
+from common import checkpoint_dir, texts, vocab, char2idx, idx2char, itexts;
 
-examples_per_epoch = len(text)
+#examples_per_epoch = len(text)
 
-char_dataset = tf.data.Dataset.from_tensor_slices(itext)
+char_datasets = []
+for itext in itexts:
+    char_datasets.append(tf.data.Dataset.from_tensor_slices(itext))
 
-#break text into chunks of size seq_length+1
-sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
+#char_dataset = tf.data.Dataset.from_tensor_slices(itext)
 
 #for each chunk, form input and target sequence
 def split_input_target(chunk):
@@ -25,8 +26,16 @@ def split_input_target(chunk):
     targett = chunk[1:]
     return inputt, targett
 
-dataset = sequences.map(split_input_target)
+def create_single_dataset(c_dataset):
+    return c_dataset.batch(seq_length+1, drop_remainder=True).map(split_input_target)
 
+#break each text into chunks of size seq_length+1
+#but don't mix inputs
+dataset = create_single_dataset(char_datasets[0])
+for char_dataset in char_datasets[1:]:
+    dataset = dataset.concatenate(create_single_dataset(char_dataset))
+
+#dataset = sequences.map(split_input_target)
 
 dataset = dataset.shuffle(buffer_size).batch(batch_size, drop_remainder=True)
 
