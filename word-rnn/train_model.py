@@ -67,4 +67,6 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         verbose=1
         )
 
+save_vocabulary(vocab)
+
 history = model.fit(dataset, epochs=epochs, callbacks=[checkpoint_callback])
