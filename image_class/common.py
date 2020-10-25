@@ -7,10 +7,10 @@ import random
 import json
 
 batch_size = 32
-image_size = (256, 256)
+image_size = (180, 180)
 validation_split = 0.2
 seed = random.randint(1,1000)
-epochs = 3
+epochs = 1000
 
 parser = argparse.ArgumentParser()
 parser.add_argument("directory", nargs=1)
@@ -43,11 +43,15 @@ def create_model(num_classes):
         layers.MaxPooling2D(),
         layers.Conv2D(32, 3, padding='same', activation='relu'),
         layers.MaxPooling2D(),
+        layers.Dropout(0.2),
         layers.Conv2D(64, 3, padding='same', activation='relu'),
         layers.MaxPooling2D(),
         layers.Dropout(0.2),
+        layers.Conv2D(128, 3, padding='same', activation='relu'),
+        layers.MaxPooling2D(),
+        layers.Dropout(0.2),
         layers.Flatten(),
-        layers.Dense(128, activation='relu'),
+        layers.Dense(256, activation='relu'),
         layers.Dense(num_classes)
         ])
     return model
